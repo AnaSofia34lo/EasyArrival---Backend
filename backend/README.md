@@ -104,10 +104,39 @@ Notas:
 
 ## Instalar y ejecutar
 
+Instalar dependencias:
+
 ```bash
 npm install
+```
+
+Compilar el proyecto:
+
+```bash
 npm run build
+```
+
+Ejecutar o Correr el proyecto:
+
+```bash
 npm run start:dev
+
+ó
+
+npm run start
+```
+
+## Ejecutar tests
+
+```bash
+# Pruebas Unitarias o Unit Tests
+npm run test
+
+# E2E (End to End) Tests (Tests de Extremo a Extremo)
+npm run test:e2e
+
+# Test con Coverage
+npm run test:cov
 ```
 
 ## SQL base
