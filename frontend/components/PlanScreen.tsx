@@ -169,6 +169,12 @@ export default function PlanScreen({
                 <span style={pillStyle}><DollarSign size={13} /> {money(best.price)} / hora</span>
                 <span style={pillStyle}><MapPin size={13} /> {best.distance} m</span>
                 <span style={pillStyle}><Footprints size={13} /> {best.walk} min caminando</span>
+                <span style={pillStyle}>{best.scheduleLabel} {best.openingTime} - {best.closingTime}</span>
+              </div>
+              <div style={{ marginTop: 14, display: "grid", gap: 6, fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: COLORS.textMuted }}>
+                <div><b style={{ color: COLORS.navy }}>Contacto:</b> {best.contactPhone}</div>
+                <div><b style={{ color: COLORS.navy }}>WhatsApp:</b> {best.contactWhatsapp}</div>
+                <div><b style={{ color: COLORS.navy }}>Dirección:</b> {best.contactAddress}</div>
               </div>
             </div>
           </div>
