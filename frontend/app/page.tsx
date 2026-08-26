@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { COLORS, FONTS } from "../components/ui/constants";
+import React, { useEffect, useState } from "react";
+import { COLORS, FONTS, sortParkingsByDestination } from "../components/ui/constants";
 import NavBar from "../components/NavBar";
 import HomeScreen from "../components/HomeScreen";
 import PlanScreen from "../components/PlanScreen";
 import MapScreen from "../components/MapScreen";
 import CompareScreen from "../components/CompareScreen";
-import { Sparkles, Clock, MapPin, Compass } from "lucide-react";
+import { Clock, MapPin, Compass } from "lucide-react";
 
 export default function EasyArrival() {
   const [screen, setScreen] = useState("home");
@@ -18,12 +18,49 @@ export default function EasyArrival() {
   const [selectedMarker, setSelectedMarker] = useState<string | null>("centro");
   const [confirmed, setConfirmed] = useState(false);
 
+  useEffect(() => {
+    const nearestParking = sortParkingsByDestination(destino)[0];
+    if (nearestParking) {
+      setSelectedMarker(nearestParking.id);
+    }
+  }, [destino]);
+
+  let prefLabel = "Mejor Opción";
+  if (pref === "ahorrar") {
+    prefLabel = "Ahorrar Dinero";
+  } else if (pref === "rapido") {
+    prefLabel = "Llegar Rápido";
+  }
+
   function handlePlan() {
     setLoading(true);
     setScreen("plan");
     setConfirmed(false);
     // Simulate loading for the IA calculations
     setTimeout(() => setLoading(false), 800);
+  }
+
+  if (screen === "home") {
+    return (
+      <div style={{ 
+        fontFamily: "'Inter', sans-serif", 
+        background: COLORS.bg, 
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column" 
+      }}>
+        <style dangerouslySetInnerHTML={{ __html: FONTS }} />
+        <HomeScreen 
+          destino={destino} 
+          setDestino={setDestino} 
+          hora={hora} 
+          setHora={setHora}
+          pref={pref} 
+          setPref={setPref} 
+          onSubmit={handlePlan} 
+        />
+      </div>
+    );
   }
 
   return (
@@ -37,24 +74,11 @@ export default function EasyArrival() {
       <style dangerouslySetInnerHTML={{ __html: FONTS }} />
       
       {/* Dynamic Navigation Header: Hidden on "home" screen */}
-      {screen !== "home" && (
-        <NavBar screen={screen} setScreen={setScreen} />
-      )}
+      <NavBar screen={screen} setScreen={setScreen} />
       
       {/* Page Content Area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {screen === "home" ? (
-          <HomeScreen 
-            destino={destino} 
-            setDestino={setDestino} 
-            hora={hora} 
-            setHora={setHora}
-            pref={pref} 
-            setPref={setPref} 
-            onSubmit={handlePlan} 
-          />
-        ) : (
-          <div className="ea-app-layout">
+        <div className="ea-app-layout">
             {/* Left Sidebar Panel (Visible on Desktop only) */}
             <div className="ea-app-sidebar">
               <div className="ea-app-sidebar-card glass-panel">
@@ -103,9 +127,7 @@ export default function EasyArrival() {
                         <Compass size={12} color={COLORS.blue} />
                         <span className="ea-app-sidebar-detail-label">Preferencia</span>
                       </div>
-                      <span className="ea-app-sidebar-detail-value">
-                        {pref === "ahorrar" ? "Ahorrar Dinero" : pref === "rapido" ? "Llegar Rápido" : "Mejor Opción"}
-                      </span>
+                      <span className="ea-app-sidebar-detail-value">{prefLabel}</span>
                     </div>
                   </div>
 
@@ -134,6 +156,7 @@ export default function EasyArrival() {
               
               {screen === "map" && (
                 <MapScreen 
+                  destino={destino}
                   selected={selectedMarker} 
                   setSelected={setSelectedMarker} 
                 />
@@ -141,12 +164,12 @@ export default function EasyArrival() {
               
               {screen === "compare" && (
                 <CompareScreen 
+                  destino={destino}
                   pref={pref} 
                 />
               )}
             </div>
           </div>
-        )}
       </div>
     </div>
   );

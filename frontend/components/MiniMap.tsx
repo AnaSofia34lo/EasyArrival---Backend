@@ -77,16 +77,9 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
 
     L.marker([6.2312, -75.6113], { icon: destIcon }).addTo(map);
 
-    // Parking Coordinates
-    const parkingCoords: Record<string, [number, number]> = {
-      centro: [6.2325, -75.6085],
-      norte: [6.2360, -75.6125],
-      sur: [6.2270, -75.6105]
-    };
-
     PARKINGS.forEach((p) => {
-      const coord = parkingCoords[p.id];
-      if (!coord) return;
+      if (!p.latitude || !p.longitude) return;
+      const coord: [number, number] = [p.latitude, p.longitude];
 
       const s = statusColor(p.availability);
       const isSel = selected === p.id;

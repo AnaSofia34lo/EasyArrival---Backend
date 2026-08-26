@@ -13,6 +13,12 @@ type ParkingRow = {
   map_y: number;
   latitude: number | null;
   longitude: number | null;
+  schedule_label: string | null;
+  opening_time: string | null;
+  closing_time: string | null;
+  contact_phone: string | null;
+  contact_whatsapp: string | null;
+  contact_address: string | null;
 };
 
 type ParkingDestinationRow = {
@@ -173,6 +179,12 @@ export class SupabaseParkingRepository extends ParkingRepository {
       Number(row.map_y),
       row.latitude === null ? null : Number(row.latitude),
       row.longitude === null ? null : Number(row.longitude),
+      row.schedule_label ?? 'Lun-Dom',
+      row.opening_time,
+      row.closing_time,
+      row.contact_phone,
+      row.contact_whatsapp,
+      row.contact_address,
     );
   }
 }
