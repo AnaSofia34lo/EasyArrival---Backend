@@ -8,17 +8,8 @@ import {
 import { COLORS, PARKINGS, statusColor, money, pillStyle, AI_SERIES } from "./ui/constants";
 import { Card } from "./ui/Card";
 import { PrimaryButton, GhostButton } from "./ui/Button";
-
-interface PlanScreenProps {
-  destino: string;
-  hora: string;
-  loading: boolean;
-  onGoMap: () => void;
-  onGoCompare: () => void;
-  onBack: () => void;
-  confirmed: boolean;
-  onConfirm: () => void;
-}
+import { useAppContext } from "../context/AppContext";
+import { useRouter } from "next/navigation";
 
 function Gauge({ value, size = 140 }: { value: number; size?: number }) {
   const [animated, setAnimated] = useState(0);
@@ -55,16 +46,21 @@ function Gauge({ value, size = 140 }: { value: number; size?: number }) {
   );
 }
 
-export default function PlanScreen({
-  destino,
-  hora,
-  loading,
-  onGoMap,
-  onGoCompare,
-  onBack,
-  confirmed,
-  onConfirm
-}: PlanScreenProps) {
+export default function PlanScreen() {
+  const {
+    destino,
+    hora,
+    loading,
+    confirmed,
+    setConfirmed,
+  } = useAppContext();
+  const router = useRouter();
+
+  const onBack = () => router.push("/");
+  const onGoMap = () => router.push("/mapa");
+  const onGoCompare = () => router.push("/comparar");
+  const onConfirm = () => setConfirmed(true);
+
   const best = PARKINGS[0];
   const s = statusColor(best.availability);
   const [mounted, setMounted] = useState(false);
@@ -169,6 +165,12 @@ export default function PlanScreen({
                 <span style={pillStyle}><DollarSign size={13} /> {money(best.price)} / hora</span>
                 <span style={pillStyle}><MapPin size={13} /> {best.distance} m</span>
                 <span style={pillStyle}><Footprints size={13} /> {best.walk} min caminando</span>
+                <span style={pillStyle}>{best.scheduleLabel} {best.openingTime} - {best.closingTime}</span>
+              </div>
+              <div style={{ marginTop: 14, display: "grid", gap: 6, fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: COLORS.textMuted }}>
+                <div><b style={{ color: COLORS.navy }}>Contacto:</b> {best.contactPhone}</div>
+                <div><b style={{ color: COLORS.navy }}>WhatsApp:</b> {best.contactWhatsapp}</div>
+                <div><b style={{ color: COLORS.navy }}>Dirección:</b> {best.contactAddress}</div>
               </div>
             </div>
           </div>

@@ -2,21 +2,19 @@
 
 import React from "react";
 import { Star, Bot } from "lucide-react";
-import { COLORS, PARKINGS, money } from "./ui/constants";
+import { COLORS, money, parkingDistanceToDestination, sortParkingsByDestination } from "./ui/constants";
 import { Card, Badge } from "./ui/Card";
+import { useAppContext } from "../context/AppContext";
 
-interface CompareScreenProps {
-  pref: string;
-}
-
-interface RowProps {
+type RowProps = Readonly<{
   label: string;
   value: React.ReactNode;
   valueColor?: string;
   last?: boolean;
-}
+}>;
 
-function Row({ label, value, valueColor, last }: RowProps) {
+function Row(props: Readonly<RowProps>) {
+  const { label, value, valueColor, last } = props;
   return (
     <div style={{
       display: "flex",
@@ -31,11 +29,18 @@ function Row({ label, value, valueColor, last }: RowProps) {
   );
 }
 
-export default function CompareScreen({ pref }: CompareScreenProps) {
-  const bestId = pref === "ahorrar" ? "norte" : pref === "rapido" ? "sur" : "centro";
-  const bestParking = PARKINGS.find((p) => p.id === bestId);
+export default function CompareScreen() {
+  const { destino, pref } = useAppContext();
+  const sortedParkings = sortParkingsByDestination(destino);
+  const bestParking = sortedParkings[0];
+  const bestId = bestParking ? bestParking.id : "centro";
   const bestName = bestParking ? bestParking.name : "";
-  const prefLabel = pref === "ahorrar" ? "ahorrar dinero" : pref === "rapido" ? "llegar rápido" : "la mejor opción general";
+  let prefLabel = "la mejor opción general";
+  if (pref === "ahorrar") {
+    prefLabel = "ahorrar dinero";
+  } else if (pref === "rapido") {
+    prefLabel = "llegar rápido";
+  }
 
   return (
     <div className="mesh-bg fade-in ea-screen-container">
@@ -47,13 +52,13 @@ export default function CompareScreen({ pref }: CompareScreenProps) {
             Comparar Alternativas
           </h1>
           <p style={{ color: COLORS.textMuted, fontFamily: "'Inter', sans-serif", fontSize: 15, marginTop: 4 }}>
-            Tres opciones evaluadas por nuestro motor de IA según tus prioridades de llegada.
+            Opciones ordenadas por cercanía al destino que escribiste.
           </p>
         </div>
 
         {/* Compare Grid */}
         <div className="ea-compare-grid" style={{ marginBottom: 32 }}>
-          {PARKINGS.map((p) => {
+          {sortedParkings.map((p, index) => {
             const isBest = p.id === bestId;
             return (
               <Card 
@@ -86,6 +91,22 @@ export default function CompareScreen({ pref }: CompareScreenProps) {
                     <Star size={11} fill="#fff" strokeWidth={0} /> RECOMENDADO
                   </div>
                 )}
+                {index === 0 && !isBest && (
+                  <div style={{
+                    position: "absolute",
+                    top: -12,
+                    left: 20,
+                    background: `linear-gradient(135deg, ${COLORS.purple}, #A78BFA)`,
+                    color: "#fff",
+                    fontSize: 11,
+                    fontWeight: 800,
+                    padding: "4px 12px",
+                    borderRadius: 999,
+                    fontFamily: "'Inter', sans-serif",
+                  }}>
+                    MÁS CERCANO
+                  </div>
+                )}
                 
                 <h3 style={{ 
                   fontFamily: "'Space Grotesk', sans-serif", 
@@ -99,8 +120,10 @@ export default function CompareScreen({ pref }: CompareScreenProps) {
                 
                 <Row label="Disponibilidad" value={<Badge status={p} />} />
                 <Row label="Precio" value={money(p.price) + "/h"} />
-                <Row label="Distancia" value={p.distance + " m"} />
+                <Row label="Distancia" value={parkingDistanceToDestination(p, destino) + " m"} />
                 <Row label="Caminando" value={p.walk + " min"} />
+                <Row label="Horario" value={`${p.scheduleLabel} · ${p.openingTime} a ${p.closingTime}`} />
+                <Row label="Contacto" value={p.contactPhone} />
                 <Row 
                   label="IA Sugiere" 
                   value={isBest ? "Sí, opción óptima" : "Alternativa"} 

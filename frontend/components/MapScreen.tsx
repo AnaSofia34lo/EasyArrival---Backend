@@ -2,18 +2,16 @@
 
 import React from "react";
 import { X, Footprints } from "lucide-react";
-import { COLORS, PARKINGS, money, pillStyle } from "./ui/constants";
+import { COLORS, money, parkingDistanceToDestination, pillStyle, sortParkingsByDestination } from "./ui/constants";
 import { Card, Badge } from "./ui/Card";
 import { PrimaryButton } from "./ui/Button";
 import MiniMap from "./MiniMap";
+import { useAppContext } from "../context/AppContext";
 
-interface MapScreenProps {
-  selected: string | null;
-  setSelected: (id: string | null) => void;
-}
-
-export default function MapScreen({ selected, setSelected }: MapScreenProps) {
-  const sel = PARKINGS.find((p) => p.id === selected);
+export default function MapScreen() {
+  const { destino, selectedMarker, setSelectedMarker } = useAppContext();
+  const sortedParkings = sortParkingsByDestination(destino);
+  const sel = sortedParkings.find((p) => p.id === selectedMarker) ?? sortedParkings[0];
 
   return (
     <div className="mesh-bg fade-in ea-screen-container">
@@ -31,7 +29,25 @@ export default function MapScreen({ selected, setSelected }: MapScreenProps) {
 
         {/* Map Area */}
         <div style={{ position: "relative", borderRadius: 24, overflow: "hidden" }}>
-          <MiniMap onSelect={setSelected} selected={selected} compact={false} />
+          <MiniMap onSelect={setSelectedMarker} selected={selectedMarker} compact={false} />
+          <div style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            background: "rgba(255, 255, 255, 0.9)",
+            backdropFilter: "blur(8px)",
+            padding: "8px 14px",
+            borderRadius: 12,
+            boxShadow: "0 4px 12px rgba(15,42,74,.08)",
+            zIndex: 10,
+            border: "1px solid rgba(226, 232, 240, 0.8)",
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 12,
+            fontWeight: 700,
+            color: COLORS.navy,
+          }}>
+            Ordenado por cercanía a: {destino || "Universidad de Medellín"}
+          </div>
           
           {/* Floating Detail Panel */}
           {sel && (
@@ -55,7 +71,7 @@ export default function MapScreen({ selected, setSelected }: MapScreenProps) {
                   {sel.name}
                 </h3>
                 <button 
-                  onClick={() => setSelected(null)} 
+                  onClick={() => setSelectedMarker(null)} 
                   style={{ 
                     background: "rgba(226, 232, 240, 0.6)", 
                     border: "none", 
@@ -80,6 +96,15 @@ export default function MapScreen({ selected, setSelected }: MapScreenProps) {
                 <Badge status={sel} />
                 <span style={pillStyle}>{money(sel.price)}/h</span>
                 <span style={pillStyle}><Footprints size={13} /> {sel.walk} min</span>
+                <span style={pillStyle}>{sel.scheduleLabel} {sel.openingTime} - {sel.closingTime}</span>
+              </div>
+
+              <div style={{ display: "grid", gap: 8, marginBottom: 16, fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: COLORS.textMuted }}>
+                <div><b style={{ color: COLORS.navy }}>Cercanía:</b> {parkingDistanceToDestination(sel, destino)} m aprox. al destino</div>
+                <div><b style={{ color: COLORS.navy }}>Horario:</b> {sel.scheduleLabel} · {sel.openingTime} a {sel.closingTime}</div>
+                <div><b style={{ color: COLORS.navy }}>Contacto:</b> {sel.contactPhone}</div>
+                <div><b style={{ color: COLORS.navy }}>WhatsApp:</b> {sel.contactWhatsapp}</div>
+                <div><b style={{ color: COLORS.navy }}>Dirección:</b> {sel.contactAddress}</div>
               </div>
 
               <PrimaryButton style={{ width: "100%", padding: "12px" }}>
