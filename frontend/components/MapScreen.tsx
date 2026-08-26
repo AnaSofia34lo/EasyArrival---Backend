@@ -6,16 +6,12 @@ import { COLORS, money, parkingDistanceToDestination, pillStyle, sortParkingsByD
 import { Card, Badge } from "./ui/Card";
 import { PrimaryButton } from "./ui/Button";
 import MiniMap from "./MiniMap";
+import { useAppContext } from "../context/AppContext";
 
-type MapScreenProps = Readonly<{
-  destino: string;
-  selected: string | null;
-  setSelected: (id: string | null) => void;
-}>;
-
-export default function MapScreen({ destino, selected, setSelected }: MapScreenProps) {
+export default function MapScreen() {
+  const { destino, selectedMarker, setSelectedMarker } = useAppContext();
   const sortedParkings = sortParkingsByDestination(destino);
-  const sel = sortedParkings.find((p) => p.id === selected) ?? sortedParkings[0];
+  const sel = sortedParkings.find((p) => p.id === selectedMarker) ?? sortedParkings[0];
 
   return (
     <div className="mesh-bg fade-in ea-screen-container">
@@ -33,7 +29,7 @@ export default function MapScreen({ destino, selected, setSelected }: MapScreenP
 
         {/* Map Area */}
         <div style={{ position: "relative", borderRadius: 24, overflow: "hidden" }}>
-          <MiniMap onSelect={setSelected} selected={selected} compact={false} />
+          <MiniMap onSelect={setSelectedMarker} selected={selectedMarker} compact={false} />
           <div style={{
             position: "absolute",
             top: 16,
@@ -75,7 +71,7 @@ export default function MapScreen({ destino, selected, setSelected }: MapScreenP
                   {sel.name}
                 </h3>
                 <button 
-                  onClick={() => setSelected(null)} 
+                  onClick={() => setSelectedMarker(null)} 
                   style={{ 
                     background: "rgba(226, 232, 240, 0.6)", 
                     border: "none", 

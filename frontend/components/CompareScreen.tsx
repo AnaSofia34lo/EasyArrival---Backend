@@ -4,11 +4,7 @@ import React from "react";
 import { Star, Bot } from "lucide-react";
 import { COLORS, money, parkingDistanceToDestination, sortParkingsByDestination } from "./ui/constants";
 import { Card, Badge } from "./ui/Card";
-
-type CompareScreenProps = Readonly<{
-  destino: string;
-  pref: string;
-}>;
+import { useAppContext } from "../context/AppContext";
 
 type RowProps = Readonly<{
   label: string;
@@ -33,7 +29,8 @@ function Row(props: Readonly<RowProps>) {
   );
 }
 
-export default function CompareScreen({ destino, pref }: CompareScreenProps) {
+export default function CompareScreen() {
+  const { destino, pref } = useAppContext();
   const sortedParkings = sortParkingsByDestination(destino);
   const bestParking = sortedParkings[0];
   const bestId = bestParking ? bestParking.id : "centro";

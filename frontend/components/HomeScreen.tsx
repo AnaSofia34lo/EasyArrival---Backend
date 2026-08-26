@@ -6,16 +6,8 @@ import { COLORS } from "./ui/constants";
 import { Card } from "./ui/Card";
 import { PrimaryButton, Chip } from "./ui/Button";
 import MiniMap from "./MiniMap";
-
-interface HomeScreenProps {
-  destino: string;
-  setDestino: (v: string) => void;
-  hora: string;
-  setHora: (v: string) => void;
-  pref: string;
-  setPref: (v: string) => void;
-  onSubmit: () => void;
-}
+import { useAppContext } from "../context/AppContext";
+import { useRouter } from "next/navigation";
 
 function LocalLogo() {
   return (
@@ -61,15 +53,27 @@ function LocalLogo() {
   );
 }
 
-export default function HomeScreen({
-  destino,
-  setDestino,
-  hora,
-  setHora,
-  pref,
-  setPref,
-  onSubmit
-}: HomeScreenProps) {
+export default function HomeScreen() {
+  const {
+    destino,
+    setDestino,
+    hora,
+    setHora,
+    pref,
+    setPref,
+    setLoading,
+    setConfirmed,
+  } = useAppContext();
+  const router = useRouter();
+
+  function handleSubmit() {
+    setLoading(true);
+    setConfirmed(false);
+    router.push("/planificar");
+    // Simulate loading for the IA calculations
+    setTimeout(() => setLoading(false), 800);
+  }
+
   return (
     <div className="mesh-bg fade-in ea-screen-container ea-home-screen">
       {/* Landing Header with only the brand logo */}
@@ -172,7 +176,7 @@ export default function HomeScreen({
             </div>
 
             <PrimaryButton 
-              onClick={onSubmit} 
+              onClick={handleSubmit} 
               style={{ marginTop: 12, padding: "16px 24px", fontSize: 15.5 }}
             >
               Planificar mi llegada
