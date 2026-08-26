@@ -3,11 +3,8 @@
 import React from "react";
 import { Navigation, Sparkles } from "lucide-react";
 import { COLORS } from "./ui/constants";
-
-interface NavBarProps {
-  screen: string;
-  setScreen: (s: string) => void;
-}
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 function Logo() {
   return (
@@ -53,32 +50,37 @@ function Logo() {
   );
 }
 
-export default function NavBar({ screen, setScreen }: NavBarProps) {
+export default function NavBar() {
+  const pathname = usePathname();
+
   const items = [
-    { id: "home", label: "Inicio" },
-    { id: "plan", label: "Planificar" },
-    { id: "map", label: "Mapa" },
-    { id: "compare", label: "Comparar" },
+    { href: "/", label: "Inicio" },
+    { href: "/planificar", label: "Planificar" },
+    { href: "/mapa", label: "Mapa" },
+    { href: "/comparar", label: "Comparar" },
   ];
 
   return (
     <div className="ea-navbar">
-      <Logo />
+      <Link href="/" style={{ textDecoration: "none" }}>
+        <Logo />
+      </Link>
       
       <div className="ea-navbar-menu">
         {items.map((it, i) => {
-          const active = screen === it.id;
+          const active = pathname === it.href;
           return (
-            <button 
+            <Link 
               key={i} 
-              onClick={() => setScreen(it.id)} 
+              href={it.href} 
               className={`ea-navbar-item ${active ? "active" : ""}`}
             >
               {it.label}
-            </button>
+            </Link>
           );
         })}
       </div>
     </div>
   );
 }
+
