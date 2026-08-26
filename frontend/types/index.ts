@@ -17,6 +17,29 @@ export interface Parking {
   contactAddress: string;
 }
 
+export interface NearbyParkingResponse {
+  parkingId: string;
+  parkingName: string;
+  pricePerHour: number;
+  distanceMeters: number;
+  walkMinutes: number;
+  currentAvailabilityPercent: number;
+  estimatedAvailabilityPercent: number;
+  confidencePercent: number;
+  explanation: string;
+  lastUpdatedAt: string | null;
+}
+
+export interface AvailabilityResponse {
+  parkingId: string;
+  parkingName: string;
+  currentAvailabilityPercent: number;
+  estimatedAvailabilityPercent: number;
+  confidencePercent: number;
+  explanation: string;
+  lastUpdatedAt: string | null;
+}
+
 export interface DestinationPoint {
   name: string;
   latitude: number;

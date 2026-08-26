@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { sortParkingsByDestination } from "../lib/utils";
+import { parkingService } from "../services/parkingService";
+import { Parking } from "../types";
 
 interface AppContextType {
   destino: string;
@@ -16,6 +17,10 @@ interface AppContextType {
   setSelectedMarker: (v: string | null) => void;
   confirmed: boolean;
   setConfirmed: (v: boolean) => void;
+  parkings: Parking[];
+  nearbyParkings: Parking[];
+  dataLoading: boolean;
+  refreshParkingData: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -27,12 +32,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [selectedMarker, setSelectedMarker] = useState<string | null>("centro");
   const [confirmed, setConfirmed] = useState(false);
+  const [parkings, setParkings] = useState<Parking[]>([]);
+  const [nearbyParkings, setNearbyParkings] = useState<Parking[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  const refreshParkingData = async () => {
+    setDataLoading(true);
+    const [all, nearby] = await Promise.all([
+      parkingService.listParkings(),
+      parkingService.listNearbyParkings(destino),
+    ]);
+    setParkings(all);
+    setNearbyParkings(nearby);
+    if (nearby[0]) {
+      setSelectedMarker(nearby[0].id);
+    }
+    setDataLoading(false);
+  };
 
   useEffect(() => {
-    const nearestParking = sortParkingsByDestination(destino)[0];
-    if (nearestParking) {
-      setSelectedMarker(nearestParking.id);
-    }
+    void refreshParkingData();
   }, [destino]);
 
   return (
@@ -50,6 +69,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSelectedMarker,
         confirmed,
         setConfirmed,
+        parkings,
+        nearbyParkings,
+        dataLoading,
+        refreshParkingData,
       }}
     >
       {children}

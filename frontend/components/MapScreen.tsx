@@ -2,109 +2,202 @@
 
 import React from "react";
 import { X, Footprints } from "lucide-react";
-import { COLORS, money, parkingDistanceToDestination, pillStyle, sortParkingsByDestination } from "./ui/constants";
+import {
+  COLORS,
+  money,
+  parkingDistanceToDestination,
+  pillStyle,
+  sortParkingsByDestination,
+} from "./ui/constants";
 import { Card, Badge } from "./ui/Card";
 import { PrimaryButton } from "./ui/Button";
 import MiniMap from "./MiniMap";
 import { useAppContext } from "../context/AppContext";
 
 export default function MapScreen() {
-  const { destino, selectedMarker, setSelectedMarker } = useAppContext();
-  const sortedParkings = sortParkingsByDestination(destino);
-  const sel = sortedParkings.find((p) => p.id === selectedMarker) ?? sortedParkings[0];
+  const { destino, selectedMarker, setSelectedMarker, nearbyParkings } =
+    useAppContext();
+  const sortedParkings = nearbyParkings.length
+    ? nearbyParkings
+    : sortParkingsByDestination(destino);
+  const sel =
+    sortedParkings.find((p) => p.id === selectedMarker) ?? sortedParkings[0];
 
   return (
     <div className="mesh-bg fade-in ea-screen-container">
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        
         {/* Header */}
         <div className="ea-section-header">
-          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, color: COLORS.navy, margin: 0 }}>
+          <h1
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 32,
+              fontWeight: 700,
+              color: COLORS.navy,
+              margin: 0,
+            }}
+          >
             Mapa de Parqueaderos
           </h1>
-          <p style={{ color: COLORS.textMuted, fontFamily: "'Inter', sans-serif", fontSize: 15, marginTop: 4 }}>
-            Visualiza y selecciona parqueaderos recomendados por la IA en tiempo real.
+          <p
+            style={{
+              color: COLORS.textMuted,
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 15,
+              marginTop: 4,
+            }}
+          >
+            Visualiza y selecciona parqueaderos recomendados por la IA en tiempo
+            real.
           </p>
         </div>
 
         {/* Map Area */}
-        <div style={{ position: "relative", borderRadius: 24, overflow: "hidden" }}>
-          <MiniMap onSelect={setSelectedMarker} selected={selectedMarker} compact={false} />
-          <div style={{
-            position: "absolute",
-            top: 16,
-            right: 16,
-            background: "rgba(255, 255, 255, 0.9)",
-            backdropFilter: "blur(8px)",
-            padding: "8px 14px",
-            borderRadius: 12,
-            boxShadow: "0 4px 12px rgba(15,42,74,.08)",
-            zIndex: 10,
-            border: "1px solid rgba(226, 232, 240, 0.8)",
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 12,
-            fontWeight: 700,
-            color: COLORS.navy,
-          }}>
+        <div
+          style={{ position: "relative", borderRadius: 24, overflow: "hidden" }}
+        >
+          <MiniMap
+            onSelect={setSelectedMarker}
+            selected={selectedMarker}
+            compact={false}
+            parkings={sortedParkings}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              background: "rgba(255, 255, 255, 0.9)",
+              backdropFilter: "blur(8px)",
+              padding: "8px 14px",
+              borderRadius: 12,
+              boxShadow: "0 4px 12px rgba(15,42,74,.08)",
+              zIndex: 10,
+              border: "1px solid rgba(226, 232, 240, 0.8)",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 12,
+              fontWeight: 700,
+              color: COLORS.navy,
+            }}
+          >
             Ordenado por cercanía a: {destino || "Universidad de Medellín"}
           </div>
-          
+
           {/* Floating Detail Panel */}
           {sel && (
-            <Card 
-              glow 
+            <Card
+              glow
               style={{
-                position: "absolute", 
-                bottom: 24, 
-                left: "50%", 
+                position: "absolute",
+                bottom: 24,
+                left: "50%",
                 transform: "translateX(-50%)",
-                width: 360, 
-                maxWidth: "calc(100% - 32px)", 
+                width: 360,
+                maxWidth: "calc(100% - 32px)",
                 boxShadow: "0 20px 40px rgba(15, 23, 42, 0.15)",
                 zIndex: 1000,
                 border: `1.5px solid ${COLORS.blue}33`,
-                animation: "slide-up-keyframes 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+                animation:
+                  "slide-up-keyframes 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 18, fontWeight: 700, color: COLORS.navy, margin: 0 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: 12,
+                }}
+              >
+                <h3
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: COLORS.navy,
+                    margin: 0,
+                  }}
+                >
                   {sel.name}
                 </h3>
-                <button 
-                  onClick={() => setSelectedMarker(null)} 
-                  style={{ 
-                    background: "rgba(226, 232, 240, 0.6)", 
-                    border: "none", 
+                <button
+                  onClick={() => setSelectedMarker(null)}
+                  style={{
+                    background: "rgba(226, 232, 240, 0.6)",
+                    border: "none",
                     borderRadius: "50%",
                     width: 26,
                     height: 26,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    cursor: "pointer", 
+                    cursor: "pointer",
                     color: COLORS.textMuted,
-                    transition: "all 0.15s ease"
+                    transition: "all 0.15s ease",
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "rgba(239, 68, 68, 0.1)"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "rgba(226, 232, 240, 0.6)"}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background =
+                      "rgba(239, 68, 68, 0.1)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background =
+                      "rgba(226, 232, 240, 0.6)")
+                  }
                 >
                   <X size={15} />
                 </button>
               </div>
 
-              <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap", marginBottom: 16 }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 8,
+                  marginTop: 12,
+                  flexWrap: "wrap",
+                  marginBottom: 16,
+                }}
+              >
                 <Badge status={sel} />
                 <span style={pillStyle}>{money(sel.price)}/h</span>
-                <span style={pillStyle}><Footprints size={13} /> {sel.walk} min</span>
-                <span style={pillStyle}>{sel.scheduleLabel} {sel.openingTime} - {sel.closingTime}</span>
+                <span style={pillStyle}>
+                  <Footprints size={13} /> {sel.walk} min
+                </span>
+                <span style={pillStyle}>
+                  {sel.scheduleLabel} {sel.openingTime} - {sel.closingTime}
+                </span>
               </div>
 
-              <div style={{ display: "grid", gap: 8, marginBottom: 16, fontFamily: "'Inter', sans-serif", fontSize: 13.5, color: COLORS.textMuted }}>
-                <div><b style={{ color: COLORS.navy }}>Cercanía:</b> {parkingDistanceToDestination(sel, destino)} m aprox. al destino</div>
-                <div><b style={{ color: COLORS.navy }}>Horario:</b> {sel.scheduleLabel} · {sel.openingTime} a {sel.closingTime}</div>
-                <div><b style={{ color: COLORS.navy }}>Contacto:</b> {sel.contactPhone}</div>
-                <div><b style={{ color: COLORS.navy }}>WhatsApp:</b> {sel.contactWhatsapp}</div>
-                <div><b style={{ color: COLORS.navy }}>Dirección:</b> {sel.contactAddress}</div>
+              <div
+                style={{
+                  display: "grid",
+                  gap: 8,
+                  marginBottom: 16,
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: 13.5,
+                  color: COLORS.textMuted,
+                }}
+              >
+                <div>
+                  <b style={{ color: COLORS.navy }}>Cercanía:</b>{" "}
+                  {parkingDistanceToDestination(sel, destino)} m aprox. al
+                  destino
+                </div>
+                <div>
+                  <b style={{ color: COLORS.navy }}>Horario:</b>{" "}
+                  {sel.scheduleLabel} · {sel.openingTime} a {sel.closingTime}
+                </div>
+                <div>
+                  <b style={{ color: COLORS.navy }}>Contacto:</b>{" "}
+                  {sel.contactPhone}
+                </div>
+                <div>
+                  <b style={{ color: COLORS.navy }}>WhatsApp:</b>{" "}
+                  {sel.contactWhatsapp}
+                </div>
+                <div>
+                  <b style={{ color: COLORS.navy }}>Dirección:</b>{" "}
+                  {sel.contactAddress}
+                </div>
               </div>
 
               <PrimaryButton style={{ width: "100%", padding: "12px" }}>
@@ -115,44 +208,73 @@ export default function MapScreen() {
         </div>
 
         {/* Legend */}
-        <div style={{ 
-          marginTop: 18, 
-          display: "flex", 
-          flexWrap: "wrap",
-          gap: 16, 
-          alignItems: "center", 
-          fontSize: 13.5, 
-          color: COLORS.textMuted, 
-          fontFamily: "'Inter', sans-serif",
-          fontWeight: 500,
-          background: "rgba(255, 255, 255, 0.5)",
-          padding: "10px 16px",
-          borderRadius: 12,
-          border: `1px solid ${COLORS.border}`,
-          width: "fit-content"
-        }}>
-          <span style={{ fontWeight: 700, color: COLORS.navy, marginRight: 4 }}>Disponibilidad IA:</span>
+        <div
+          style={{
+            marginTop: 18,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            alignItems: "center",
+            fontSize: 13.5,
+            color: COLORS.textMuted,
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 500,
+            background: "rgba(255, 255, 255, 0.5)",
+            padding: "10px 16px",
+            borderRadius: 12,
+            border: `1px solid ${COLORS.border}`,
+            width: "fit-content",
+          }}
+        >
+          <span style={{ fontWeight: 700, color: COLORS.navy, marginRight: 4 }}>
+            Disponibilidad IA:
+          </span>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.green }} />
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: COLORS.green,
+              }}
+            />
             <span>Alta (&ge;75%)</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.orange }} />
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: COLORS.orange,
+              }}
+            />
             <span>Media (50-74%)</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: COLORS.red }} />
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: COLORS.red,
+              }}
+            />
             <span>Baja (&lt;50%)</span>
           </div>
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes slide-up-keyframes {
           from { transform: translate(-50%, 20px); opacity: 0; }
           to { transform: translate(-50%, 0); opacity: 1; }
         }
-      ` }} />
+      `,
+        }}
+      />
     </div>
   );
 }

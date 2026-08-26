@@ -2,15 +2,22 @@
 
 import React, { useState, useEffect } from "react";
 import { COLORS, PARKINGS, statusColor } from "./ui/constants";
+import { Parking } from "../types";
 import { Sparkles } from "lucide-react";
 
 interface MiniMapProps {
   onSelect?: (id: string) => void;
   selected?: string | null;
   compact?: boolean;
+  parkings?: Parking[];
 }
 
-export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
+export default function MiniMap({
+  onSelect,
+  selected,
+  compact,
+  parkings = PARKINGS,
+}: MiniMapProps) {
   const mapRef = React.useRef<HTMLDivElement>(null);
   const leafletMapRef = React.useRef<any>(null);
   const [L, setL] = useState<any>(null);
@@ -30,12 +37,15 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
         center: [6.2312, -75.6113],
         zoom: 15,
         zoomControl: false,
-        attributionControl: false
+        attributionControl: false,
       });
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-        maxZoom: 19
-      }).addTo(map);
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        {
+          maxZoom: 19,
+        },
+      ).addTo(map);
 
       leafletMapRef.current = map;
     }
@@ -72,12 +82,12 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
       `,
       className: "custom-dest-icon",
       iconSize: [30, 42],
-      iconAnchor: [15, 42]
+      iconAnchor: [15, 42],
     });
 
     L.marker([6.2312, -75.6113], { icon: destIcon }).addTo(map);
 
-    PARKINGS.forEach((p) => {
+    parkings.forEach((p) => {
       if (!p.latitude || !p.longitude) return;
       const coord: [number, number] = [p.latitude, p.longitude];
 
@@ -85,20 +95,24 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
       const isSel = selected === p.id;
 
       const iconHtml = `
-        <div style="position: relative; width: ${isSel ? '42px' : '34px'}; height: ${isSel ? '42px' : '34px'}; transform: translate(-50%, -50%);">
-          ${isSel ? `
+        <div style="position: relative; width: ${isSel ? "42px" : "34px"}; height: ${isSel ? "42px" : "34px"}; transform: translate(-50%, -50%);">
+          ${
+            isSel
+              ? `
             <div style="
               position: absolute; inset: -12px; border-radius: 50%; background: ${s.c}; opacity: 0.22;
               animation: sa-pulse 1.8s ease-out infinite;
             "></div>
-          ` : ""}
+          `
+              : ""
+          }
           <div style="
             width: 100%; height: 100%; border-radius: 50%; background: ${s.c};
             border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,.15);
             display: flex; align-items: center; justify-content: center;
             transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
           ">
-            <span style="font-family: 'IBM Plex Mono', monospace; font-size: ${isSel ? '12px' : '11px'}; font-weight: 700; color: #fff;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: ${isSel ? "12px" : "11px"}; font-weight: 700; color: #fff;">
               P
             </span>
           </div>
@@ -109,7 +123,7 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
         html: iconHtml,
         className: "custom-parking-icon",
         iconSize: [isSel ? 42 : 34, isSel ? 42 : 34],
-        iconAnchor: [isSel ? 21 : 17, isSel ? 21 : 17]
+        iconAnchor: [isSel ? 21 : 17, isSel ? 21 : 17],
       });
 
       const marker = L.marker(coord, { icon: pIcon }).addTo(map);
@@ -119,7 +133,7 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
         }
       });
     });
-  }, [L, selected, onSelect]);
+  }, [L, selected, onSelect, parkings]);
 
   useEffect(() => {
     return () => {
@@ -131,47 +145,63 @@ export default function MiniMap({ onSelect, selected, compact }: MiniMapProps) {
   }, []);
 
   return (
-    <div className="ea-map-wrapper" style={{
-      position: "relative",
-      width: "100%",
-      height: compact ? 320 : undefined,
-      borderRadius: 24,
-      overflow: "hidden",
-      background: "#EFF3F9",
-      border: `1px solid ${COLORS.border}`,
-      boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
-      zIndex: 1
-    }}>
+    <div
+      className="ea-map-wrapper"
+      style={{
+        position: "relative",
+        width: "100%",
+        height: compact ? 320 : undefined,
+        borderRadius: 24,
+        overflow: "hidden",
+        background: "#EFF3F9",
+        border: `1px solid ${COLORS.border}`,
+        boxShadow: "0 10px 30px rgba(15, 23, 42, 0.04)",
+        zIndex: 1,
+      }}
+    >
       <div ref={mapRef} style={{ width: "100%", height: "100%" }} />
 
-      <div style={{
-        position: "absolute",
-        top: 16,
-        left: 16,
-        background: "rgba(255, 255, 255, 0.9)",
-        backdropFilter: "blur(8px)",
-        padding: "8px 14px",
-        borderRadius: 12,
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        boxShadow: "0 4px 12px rgba(15,42,74,.08)",
-        zIndex: 10,
-        border: "1px solid rgba(226, 232, 240, 0.8)"
-      }}>
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          left: 16,
+          background: "rgba(255, 255, 255, 0.9)",
+          backdropFilter: "blur(8px)",
+          padding: "8px 14px",
+          borderRadius: 12,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          boxShadow: "0 4px 12px rgba(15,42,74,.08)",
+          zIndex: 10,
+          border: "1px solid rgba(226, 232, 240, 0.8)",
+        }}
+      >
         <Sparkles size={13.5} color={COLORS.purple} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: COLORS.navy, fontFamily: "'Inter', sans-serif" }}>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: COLORS.navy,
+            fontFamily: "'Inter', sans-serif",
+          }}
+        >
           Predicción IA activa
         </span>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @keyframes sa-pulse { 0% { transform: scale(0.6); opacity: 0.45; } 100% { transform: scale(1.8); opacity: 0; } }
         .custom-dest-icon, .custom-parking-icon {
           background: none !important;
           border: none !important;
         }
-      ` }} />
+      `,
+        }}
+      />
     </div>
   );
 }
