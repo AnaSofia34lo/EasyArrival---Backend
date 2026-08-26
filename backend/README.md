@@ -4,9 +4,12 @@ Backend en NestJS siguiendo Clean Architecture.
 
 ## Funcionalidades implementadas
 
-1. Mostrar distancia entre parqueadero y destino.
-2. Mostrar parqueaderos cercanos al destino final.
-3. Mostrar disponibilidad actual y disponibilidad estimada con IA.
+1. Mostrar precios
+2. Mostrar horarios de los parqueaderos
+3. Mostrar información de contacto del parqueadero.
+4. Mostrar distancia entre parqueadero y destino.
+5. Mostrar parqueaderos cercanos al destino final.
+6. Mostrar disponibilidad actual y disponibilidad estimada con IA.
 
 ## Arquitectura
 
